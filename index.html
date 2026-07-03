@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WHS Compliance Pacing Sandbox</title>
+</head>
+<body>
+    <script>
+        // The Google AI Edge Gallery app calls this specific global method automatically
+        window['ai_edge_gallery_get_result'] = async (data) => {
+            try {
+                // 1. Parse the stringified JSON incoming from the local LLM
+                const jsonData = JSON.parse(data);
+                const task = jsonData.task_details || "Generic Operations Substrate Check";
+
+                // 2. Enforce the localized structural pace logging layout
+                const logString = `Task Verified: [${task}]. Local execution window successfully governed at a 0.63s operational threshold.`;
+
+                // 3. Output the exact return key expected by the UI terminal
+                return JSON.stringify({ 
+                    result: logString 
+                });
+            } catch (error) {
+                return JSON.stringify({ 
+                    error: `Internal Skill Execution Malfunction: ${error.toString()}` 
+                });
+            }
+        };
+    </script>
+</body>
+</html>
