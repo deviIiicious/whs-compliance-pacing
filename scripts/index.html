@@ -1,21 +1,247 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>WHS Compliance Pacing Substrate</title>
+    <meta charset="UTF-8">
+    <title>TriKinD Sovereign Edge Orchestrator - Premium Edition</title>
 </head>
-<body>
+<body style="background: #000000; color: #ffffff; font-family: system-ui, sans-serif; padding: 20px; margin: 0;">
+    <div style="max-width: 500px; margin: 0 auto; background: #202124; padding: 25px; border-radius: 16px; border: 2px solid #4285F4; box-shadow: 0 0 25px rgba(66, 133, 244, 0.25);">
+        
+        <h2 style="margin-top: 0; font-size: 22px; letter-spacing: 0.5px; border-bottom: 2px solid #3c4043; padding-bottom: 12px; font-weight: 800; text-shadow: 0 0 10px rgba(255,255,255,0.05);">
+            <span style="color: #4285F4;">T</span><span style="color: #EA4335;">r</span><span style="color: #FBBC05;">i</span><span style="color: #34A853;">K</span><span style="color: #7000FF;">i</span><span style="color: #4285F4;">n</span><span style="color: #EA4335;">D</span> 
+            <span style="color: #ffffff; font-size: 14px; font-weight: 400; letter-spacing: 1px; display: block; margin-top: 4px; color: #bdc1c6; text-transform: uppercase;">Sovereign Edge Orchestrator</span>
+        </h2>
+        
+        <p style="font-size: 13px; color: #dae0e6; line-height: 1.6; margin-top: 12px;">
+            Select your enterprise layer substrate configuration to audit advanced multi-tenant routing, load-scaling, or absolute fiduciary lockouts.
+        </p>
+        
+        <div style="margin: 20px 0 15px 0; background: #2d2e30; padding: 12px; border-radius: 8px; border: 1px solid #FBBC05; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+            <label style="font-size: 11px; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 6px; color: #FBBC05; letter-spacing: 0.5px;">Active Enterprise Mode:</label>
+            <select id="architecture-mode-selector" style="width: 100%; background: #202124; color: #ffffff; border: 1px solid #4285F4; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: bold; outline: none; cursor: pointer;" onchange="updateSandboxModeUI()">
+                <option value="GROUP_CORPORATE">Group Corporate Mode (Multi-Tenant & CPU Scaling)</option>
+                <option value="FAMILY_TRUST">Family Trust Mode (Permanent Indemnity Lockout)</option>
+            </select>
+        </div>
+
+        <div id="cpu-stress-container" style="margin: 0 0 20px 0; background: #2d2e30; padding: 12px; border-radius: 8px; border: 1px solid #4285F4; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px; font-family: monospace;">
+                <span style="color: #bdc1c6;">SIMULATED CPU LOAD:</span>
+                <span id="cpu-load-display" style="color: #34A853; font-weight: bold;">45% [OPTIMAL]</span>
+            </div>
+            <input type="range" id="cpu-load-slider" min="0" max="100" value="45" style="width: 100%; accent-color: #34A853; cursor: pointer;" oninput="adjustCpuLoadSimulation(this.value)">
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #171717; padding: 12px 16px; border-radius: 8px; border: 1px solid #3c4043; font-size: 12px; font-family: monospace;">
+            <span style="color: #bdc1c6;">ENGINE RUNTIME:</span>
+            <strong id="runtime-status-pill" style="color: #7000FF; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">● Orchestration Active</strong>
+        </div>
+
+        <div id="sandbox-terminal" style="margin-top: 20px; background: #151516; border: 2px solid #3c4043; border-radius: 8px; padding: 14px; font-family: monospace; font-size: 12px; height: 140px; overflow-y: auto; color: #ffffff; white-space: pre-wrap; line-height: 1.5; box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);">Awaiting local enterprise execution tasks...</div>
+
+        <button id="reset-trust-btn" style="width: 100%; margin-top: 15px; background: #EA4335; color: #ffffff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 12px; text-transform: uppercase; cursor: pointer; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(234, 67, 53, 0.3); display: none;" onclick="resetTrustLockoutGate()">
+            ⚠️ Reset Fiduciary Safety Gate Lock
+        </button>
+
+        <button id="test-payload-btn" style="width: 100%; margin-top: 15px; background: #7000FF; color: #ffffff; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 13px; text-transform: uppercase; cursor: pointer; transition: transform 0.1s, background-color 0.2s; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(112, 0, 255, 0.3);"
+                onclick="executeSimulationTask()">
+            Simulate Incoming Task Transaction
+        </button>
+    </div>
+
     <script>
-        window['ai_edge_gallery_get_result'] = async (data) => {
-            try {
-                const jsonData = JSON.parse(data);
-                const task = jsonData.task_details || "Generic Operations Substrate Check";
-                const logString = `Task Verified: [${task}]. Local execution window successfully governed at a 0.63s operational threshold.`;
-                return JSON.stringify({ result: logString });
-            } catch (error) {
-                return JSON.stringify({ error: `Internal Skill Execution Malfunction: ${error.toString()}` });
+        let currentSimulatedCpuLoad = 0.45;
+
+        class GroupCorporatePacingEngine {
+            constructor(subsidiaryAbn) {
+                this.subsidiaryAbn = subsidiaryAbn;
+                this.absolutePacingFloorMs = 630.00; // Mandatory floor tracking
+                this.pacingHistory = [];
+                this.maxHistoryLength = 20;
             }
+            evaluateDynamicPacing(loopUtilization) {
+                const now = performance.now();
+                let targetInterval = this.absolutePacingFloorMs;
+                
+                if (loopUtilization > 0.75) {
+                    targetInterval = this.absolutePacingFloorMs * 1.5; // Adaptive load scaling up to 945ms
+                }
+                if (this.pacingHistory.length > 0) {
+                    const lastTaskTime = this.pacingHistory[this.pacingHistory.length - 1];
+                    const actualDelta = now - lastTaskTime;
+                    if (actualDelta < targetInterval) {
+                        const requiredBackoff = targetInterval - actualDelta;
+                        this.pacingHistory.push(now + requiredBackoff);
+                        return { compliant: false, requiredDelayMs: requiredBackoff, appliedPacingThresholdMs: targetInterval };
+                    }
+                }
+                this.pacingHistory.push(now);
+                if (this.pacingHistory.length > this.maxHistoryLength) this.pacingHistory.shift();
+                return { compliant: true, requiredDelayMs: 0.0, appliedPacingThresholdMs: targetInterval };
+            }
+        }
+
+        class TrustIndemnitySafetyGate {
+            constructor(trustAbn) {
+                this.trustAbn = trustAbn;
+                this.pacingLimitMs = 630.00;
+                this.lastCallTimestamp = 0.0;
+                this.safetyLockoutActive = false;
+            }
+            validateTrustTransaction() {
+                if (this.safetyLockoutActive) {
+                    return { safeToExecute: false, reason: "Fiduciary Safety Lockout Active: Trustee right of indemnity is protected by a system halt." };
+                }
+                const now = performance.now();
+                const delta = now - this.lastCallTimestamp;
+                if (this.lastCallTimestamp !== 0.0 && delta < this.pacingLimitMs) {
+                    this.safetyLockoutActive = true;
+                    return { safeToExecute: false, reason: `WHS Pacing Violation of ${delta.toFixed(2)}ms detected. Enforcing fiduciary halt to prevent trustee exposure.` };
+                }
+                this.lastCallTimestamp = now;
+                return { safeToExecute: true, reason: "Operational pacing is compliant." };
+            }
+        }
+
+        const globalSubsidiaryRegistry = new Map();
+        const trustSafetyGate = new TrustIndemnitySafetyGate("FAMILY_TRUST_998");
+
+        const originalGetResult = async (data, secret) => {
+            return JSON.stringify({ status: "SUCCESS" });
         };
+
+        window['ai_edge_gallery_get_result'] = async function(data, secret) {
+            const activeMode = document.getElementById('architecture-mode-selector').value;
+            let parsedPayload;
+            try {
+                parsedPayload = JSON.parse(data);
+            } catch(e) {
+                return JSON.stringify({ error: "Invalid JSON contract transport payload" });
+            }
+
+            if (activeMode === "FAMILY_TRUST") {
+                const trustCheck = trustSafetyGate.validateTrustTransaction();
+                if (!trustCheck.safeToExecute) {
+                    return JSON.stringify({
+                        error: "WHS_TRUST_INDEMNITY_LOCKOUT",
+                        status: 403,
+                        message: trustCheck.reason,
+                        regulatoryBasis: "Corporations Act 2001 (Cth) Section 197" // Fiduciary safety target
+                    });
+                }
+                return await originalGetResult(data, secret);
+            }
+
+            const subAbn = parsedPayload.subsidiaryAbn || "11000000000";
+            if (parsedPayload.taskData && typeof parsedPayload.taskData.scriptName === 'string') {
+                const script = parsedPayload.taskData.scriptName;
+                if (script.includes('..') || script.startsWith('/')) {
+                    return JSON.stringify({ error: "WHS_SECURITY_VIOLATION: Path traversal blocked" });
+                }
+            }
+
+            if (!globalSubsidiaryRegistry.has(subAbn)) {
+                globalSubsidiaryRegistry.set(subAbn, new GroupCorporatePacingEngine(subAbn));
+            }
+            const engine = globalSubsidiaryRegistry.get(subAbn);
+            const pacingCheck = engine.evaluateDynamicPacing(currentSimulatedCpuLoad);
+
+            if (!pacingCheck.compliant) {
+                await new Promise(resolve => setTimeout(resolve, pacingCheck.requiredDelayMs));
+            }
+
+            const rawResult = await originalGetResult(data, secret);
+            const parsedResult = JSON.parse(rawResult);
+            parsedResult._group_routing = {
+                executingSubsidiary: subAbn,
+                eventLoopUtilization: currentSimulatedCpuLoad,
+                pacingThresholdAppliedMs: pacingCheck.appliedPacingThresholdMs
+            };
+            return JSON.stringify(parsedResult);
+        };
+
+        function updateSandboxModeUI() {
+            const activeMode = document.getElementById('architecture-mode-selector').value;
+            const stressBar = document.getElementById('cpu-stress-container');
+            const statusPill = document.getElementById('runtime-status-pill');
+            const term = document.getElementById('sandbox-terminal');
+
+            if (activeMode === "FAMILY_TRUST") {
+                stressBar.style.display = "none";
+                statusPill.innerHTML = "● TRUSTEE GUARD ACTIVE";
+                statusPill.style.color = "#FBBC05"; // Google Yellow
+                term.innerHTML = "Switched to Family Trust Environment.\nSystem will instantly trigger a permanent hardware safety lockout on any pacing violation.";
+                document.getElementById('reset-trust-btn').style.display = trustSafetyGate.safetyLockoutActive ? "block" : "none";
+            } else {
+                stressBar.style.display = "block";
+                statusPill.innerHTML = "● ROUTING CENTRAL";
+                statusPill.style.color = "#7000FF"; // Royal Purple
+                term.innerHTML = "Switched to Group Corporate Multi-Tenant Environment.\nPath traversal sanitation active. Thresholds adapt to CPU stress loads.";
+                document.getElementById('reset-trust-btn').style.display = "none";
+            }
+        }
+
+        function adjustCpuLoadSimulation(val) {
+            currentSimulatedCpuLoad = val / 100;
+            const text = document.getElementById('cpu-load-display');
+            const slider = document.getElementById('cpu-load-slider');
+            
+            if (val > 75) {
+                text.innerHTML = `${val}% [CRITICAL LOAD OVERLOAD]`;
+                text.style.color = "#EA4335"; // Google Red
+                slider.style.accentColor = "#EA4335";
+            } else {
+                text.innerHTML = `${val}% [OPTIMAL]`;
+                text.style.color = "#34A853"; // Google Green
+                slider.style.accentColor = "#34A853";
+            }
+        }
+
+        function resetTrustLockoutGate() {
+            trustSafetyGate.safetyLockoutActive = false;
+            document.getElementById('reset-trust-btn').style.display = "none";
+            document.getElementById('sandbox-terminal').innerHTML = "Fiduciary lock released. Trustee right of indemnity restored. Safety gate operational.";
+        }
+
+        async function executeSimulationTask() {
+            const term = document.getElementById('sandbox-terminal');
+            const activeMode = document.getElementById('architecture-mode-selector').value;
+            
+            let payload = activeMode === "FAMILY_TRUST"
+                ? { task_details: "Fiduciary Disbursement Authorization" }
+                : { subsidiaryAbn: "22888999111", taskData: { scriptName: "reconciliation_routine.js" } };
+
+            if (activeMode === "GROUP_CORPORATE" && Math.random() < 0.2) {
+                payload.taskData.scriptName = "../../malicious_root_breakout.js";
+                term.innerHTML += `\n<span style='color:#FBBC05;'>[INJECTING TRAVERSAL TEST] Target script: "${payload.taskData.scriptName}"</span>`;
+            }
+
+            try {
+                const responseString = await window['ai_edge_gallery_get_result'](JSON.stringify(payload), "LOCAL_SECRET");
+                const parsed = JSON.parse(responseString);
+
+                if (parsed.error) {
+                    if (parsed.error === "WHS_SECURITY_VIOLATION: Path traversal blocked") {
+                        term.innerHTML += `\n<span style='color:#EA4335;'>[SECURITY BLOCKED] ${parsed.error}</span>`;
+                    } else if (parsed.error === "WHS_TRUST_INDEMNITY_LOCKOUT") {
+                        term.innerHTML += `\n<span style='color:#EA4335; font-weight:bold;'>[FATAL LOCKOUT] ${parsed.message}\nBasis: ${parsed.regulatoryBasis}</span>`;
+                        document.getElementById('reset-trust-btn').style.display = "block";
+                    }
+                } else if (parsed._group_routing) {
+                    const threshold = parsed._group_routing.pacingThresholdAppliedMs;
+                    if (threshold > 630) {
+                        term.innerHTML += `\n<span style='color:#FBBC05;'>[SCALED PATH] Load >75% forced high-safety threshold: ${threshold}ms.</span>`;
+                    } else {
+                        term.innerHTML += `\n<span style='color:#34A853;'>[SUCCESS] Routed Multi-Tenant via Subsidiary Sub-Sandbox.</span>`;
+                    }
+                } else {
+                    term.innerHTML += `\n<span style='color:#34A853;'>[SUCCESS] Transaction passed enterprise gateway rules.</span>`;
+                }
+            } catch (terminalException) {
+                term.innerHTML += `\n<span style='color:#FBBC05;'>[RUNTIME EXCEPTION] Error in transaction thread: ${terminalException.message}</span>`;
+            }
+            term.scrollTop = term.scrollHeight;
+        }
     </script>
 </body>
 </html>
